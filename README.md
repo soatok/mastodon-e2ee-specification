@@ -15,6 +15,14 @@ were not spearheaded by cryptography experts. The linked pull request proposed a
 achieve message franking. This was also implemented entirely in Ruby, which means that the Mastodon server administrator
 could read everything... thereby failing to achieve the _end-to-end_ part of end-to-end encryption.
 
+> **Rough Draft Notice:**
+>
+> This Git repository contains the outline for my proposal for solving this privacy issue for Mastodon. Many of the
+> deliverables may need to be implemented as an ActivityPub extension (or even as an update to the protocol itself).
+> 
+> However, that doesn't really change how the cryptography looks, so we're not concerned with which layer
+> this gets implemented into right now. We'll cross that bridge once we have the cryptography figured out.
+
 ## Executive Summary
 
 We propose an architecture that's predicated on key material never being revealed to the server. To this end, we begin
