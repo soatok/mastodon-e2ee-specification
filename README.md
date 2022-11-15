@@ -15,13 +15,9 @@ were not spearheaded by cryptography experts. The linked pull request proposed a
 achieve message franking. This was also implemented entirely in Ruby, which means that the Mastodon server administrator
 could read everything... thereby failing to achieve the _end-to-end_ part of end-to-end encryption.
 
-> **Rough Draft Notice:**
->
-> This Git repository contains the outline for my proposal for solving this privacy issue for Mastodon. Many of the
-> deliverables may need to be implemented as an ActivityPub extension (or even as an update to the protocol itself).
-> 
-> However, that doesn't really change how the cryptography looks, so we're not concerned with which layer
-> this gets implemented into right now. We'll cross that bridge once we have the cryptography figured out.
+As cryptographers and security engineers, we aim to deliver end-to-end encryption to the Fediverse through ActivityPub,
+so that we might communicate privately when using Mastodon. Thus, while the goal is E2EE DMs in Mastodon, the scope will
+be appropriately broad in some areas.
 
 ## Executive Summary
 
@@ -48,6 +44,34 @@ attacks (see: [Invisible Salamanders](https://eprint.iacr.org/2019/016)).
    * Eschew X.509, ASN.1, etc. in favor of simpler binary formats, where possible.
 4. **Use State-of-the-Art Cryptography.** We're writing this in the later months of 2022, not the 1990's.
    We don't need to be backwards compatible with legacy formats. Absolutely no RSA, AES-CBC, etc.
+
+### Anti-Tenets
+
+1. **Interoperability with Legacy.** We aren't interested in our proposal interoperating with OpenPGP,
+   Matrix, etc.
+   * If someone else wants to build something interoperable with our cryptography, that's okay. But we're not aiming
+     to support existing designs.
+2. **Competing with Secure Messaging apps.** We aren't building a replacement for Signal. We just want direct messages
+   to remain confidential.
+3. **Deniability and/or Anonymity.** We cannot hide the social graph from ActivityPub, nor escape the use of
+   [HTTP Signatures](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures-13).
+
+### Security Goals
+
+1. **Confidentiality**. Direct Messages are currently shared between instances such that they are encrypted in transit
+   (provided by TLS). However, the contents of the messages are not end-to-end encrypted, so a curious instance admin
+   may read their users' DMs. We want to provide confidentiality between all users.
+2. **Integrity**. Direct Messages that use end-to-end encryption should be tamper-resistant for all participants in
+   a conversation.
+3. **Authenticity**. All participants in a group should be able to prove who sent a given encrypted message.
+4. **Abuse-Resistant**. It should be possible to report abusive messages to an instance admin.
+   * Instead of message franking, we will opt for committing AEAD constructions.
+5. **Domain Separation**. Every use of a hash function or KDF will be isolated through domain separation constants to
+   prevent cryptographic outputs from being accepted in an inappropriate context.
+6. **Protocol Lucidity**. All encrypted messages will be bound to a given context, to avoid Confused Deputy attacks.
+   We will use versioned protocols instead of in-band negotiation, to avoid Algorithm Confusion attacks.
+7. **Negative Known Answer Tests**. Every security property **SHOULD** be accompanied by a Known Answer Test (also
+   sometimes called a Test Vector) that is intended to fail, so that implementations can be secure by design.
 
 ## Components
 
