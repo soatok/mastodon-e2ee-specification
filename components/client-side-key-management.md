@@ -247,3 +247,8 @@ It should be acceptable to use multiple recovery mechanisms (i.e. encrypt with p
 device, **AND** allow a quorum of your most friends to recover your keys) if the user so desires.
 
 However, it should also be acceptable to opt out of recovery mechanisms entirely, for power users.
+
+## Future Scope
+
+Although it's not captured above, one feature I'd like to support (when browsers allow it) is the ability to encrypt
+your key with a FIDO2-compliant hardware security device (e.g. Yubikey or SoloKey) instead of a password.
