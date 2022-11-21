@@ -33,9 +33,9 @@ This is exclusively used for devices that do not possess a camera (i.e. browser 
 2. **Receiver**: Call [`CreateQRCodeForImport(ed25519_pk)`](#createqrcodeforimport)
 3. **Receiver**: Display QR code, begin polling server for message from Sender
 4. **Sender**: Scan QR code (from step 3)
-5. **Sender**: Call [`ExportMainKey(main_key, ed25519_pk, device_name = "")`](#exportmainkey)
+5. **Sender**: Call [`SealMainKey(main_key, ed25519_pk, device_name = "")`](#sealmainkey)
 6. **Sender**: Send the exported key to the server to relay to Receiver
-7. **Receiver**: Call [`ImportMainKey(paseto, ed25519_sk, device_name = "")`](#unsealmainkey)
+7. **Receiver**: Call [`UnsealMainKey(paseto, ed25519_sk, device_name = "")`](#unsealmainkey)
 
 ### Workflows 2 and 3
 
@@ -62,7 +62,7 @@ This is used for [Workflow 1](#workflow-1). This will run on the device that rec
 1. Encode the public key `ed25519_pk` using the
    [PASERK `public`](https://github.com/paseto-standard/paserk/blob/master/types/public.md) type.
 
-### ExportMainKey
+### SealMainKey
 
 This is used for [Workflow 1](#workflow-1). This will run on the device that sends the key.
 
