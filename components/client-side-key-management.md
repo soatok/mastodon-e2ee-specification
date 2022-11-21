@@ -206,25 +206,25 @@ cryptographic algorithms used in whatever protocols we design.
 
 ## High-Level Design
 
-* Client-Side Keys will consist of a 256-bit random key, which will be used as the IKM input to HKDF for deriving
-  multiple keys, including:
+* Client-Side Keys will consist of a 256-bit random key, called the **main key** for an account, which will be used as 
+  the IKM input to HKDF for deriving multiple keys, including:
   * An Ed25519 identity key. The public key will be used for the [Federated PKI](federated-pki.md).
   * A symmetric key for wrapping one-time secret keys (for multi-device support).
-* Users **SHOULD** generate their key on a mobile device, but are not strictly required to.
+* Users **SHOULD** generate their main key on a mobile device, but are not strictly required to.
   * For users that do not have a mobile device, the Browser Extension is recommended.
-* Keys will be exportable. For example:
+* Main Keys will be exportable. For example:
   * Export to another mobile device, for multi-device support.
   * Export to a Browser Extension for use with Fediverse websites.
   * Export to a desktop app (if applicable).
-* Users will be able to encrypt their key with a passphrase.
+* Users will be able to encrypt their main key with a passphrase.
   * This passphrase-protected key **MAY** be stored in the Mastodon server.
   * This is beneficial to user profiles: **Alice**, **Bob**, **Chloe**.
 * Users will be able to use a threshold scheme to share their key with a group of their most trusted friends.
   * This is beneficial to user profiles: **Bob**, **Chloe**, **Duncan**.
   * Users like **Alice** generally won't want this feature.
   * Threats like **Ollie** make this an unattractive option for many users.
-* Users can, at any time, generate a new key.
-  * If they still have their previous key, they may maintain continuity of key control.
+* Users can, at any time, generate a new main key.
+  * If they still have their previous main key, they may maintain continuity of key control.
   * If they do not, they can still re-enroll their new key, but will not have access to old messages. All existing 
     one-time keypairs will be invalidated. Additionally, their Direct Message partners will be informed of the
     rotation when they send another message.
