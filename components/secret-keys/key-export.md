@@ -82,13 +82,19 @@ This is used for [Workflow 1](#workflow-1). This will run on the device that sen
 1. Generate a one-time 256-bit transfer key `transfer_key`.
 2. Use PASERK's [`seal`](https://github.com/paseto-standard/paserk/blob/master/types/seal.md) type to encrypt
    `transfer_key` with `ed25519_pk` (Input 2) to yield `sealed_transfer_key`.
-3.  Generate a Local PASETO token using `transfer_key` with the following parameters:
-* `payload`:
-    * `main_key`: Input 1
-* `footer`:
-    * `wpk`: `sealed_transfer_key`
-* `implicit_assertion`:
-    * `device`: Input 3
+   * With the following parameters:
+     * PASETO v3 (PBKDF2-SHA384):
+       * `iterations`: `250_000`
+     * PASETO v4 (Argon2id):
+       * `memlimit`: `1_073_741_824` (`crypto_pwhash_MEMLIMIT_SENSITIVE`)
+       * `opslimit`: `4` (`crypto_pwhash_OPSLIMIT_SENSITIVE`)
+3. Generate a Local PASETO token using `transfer_key` with the following parameters:
+   * `payload`:
+     * `main_key`: Input 1
+   * `footer`:
+     * `wpk`: `sealed_transfer_key`
+   * `implicit_assertion`:
+     * `device`: Input 3
 4. Encode the PASETO token (output of step 3) as a QR code image to be scanned with a mobile device.
 
 The permitted algorithms for this operation (as of the time of this writing) are:
