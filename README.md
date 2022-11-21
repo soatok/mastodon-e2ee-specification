@@ -96,36 +96,52 @@ protocol. This is the only part that interacts with user-generated content (rath
 
 ## Structure of the Deliverables
 
+### Kotlin Libraries
+
+* Client-Side Key Management:
+* Interacting with the Federated Public Key Infrastructure:
+* Asynchronous Forward-Secure Ratcheting Protocol:
+* Symmetric-Key Message Encryption Format:
+
+### Ruby Libraries
+
+* Interacting with the Federated Public Key Infrastructure:
+
+### Swift Libraries
+
+* Client-Side Key Management:
+* Interacting with the Federated Public Key Infrastructure:
+* Asynchronous Forward-Secure Ratcheting Protocol:
+* Symmetric-Key Message Encryption Format:
+
+### TypeScript Libraries
+
+* Client-Side Key Management:
+* Interacting with the Federated Public Key Infrastructure:
+* Asynchronous Forward-Secure Ratcheting Protocol:
+* Symmetric-Key Message Encryption Format:
+
 ### Mastodon-Android
 
-* External Libraries
-  * Client-Side Key Management:
-  * Interacting with the Federated Public Key Infrastructure:
-  * Asynchronous Forward-Secure Ratcheting Protocol:
-  * Symmetric-Key Message Encryption Format:
+* See: [Kotlin libraries](#kotlin-libraries)
 * New classes/functions:
   * ...
 
 ### Mastodon-iOS
 
-
-* External Libraries
-  * Client-Side Key Management:
-  * Interacting with the Federated Public Key Infrastructure:
-  * Asynchronous Forward-Secure Ratcheting Protocol:
-  * Symmetric-Key Message Encryption Format:
+* See: [Swift libraries](#swift-libraries)
 * New classes/functions:
   * ...
 
-### Mastodon (Web)
+### Mastodon (Web Server)
 
-* External Libraries
-  * Client-Side Key Management:
-  * Interacting with the Federated Public Key Infrastructure:
-  * Asynchronous Forward-Secure Ratcheting Protocol:
-  * Symmetric-Key Message Encryption Format:
+* See: [Ruby libraries](#ruby-libraries)
 * New classes/functions:
   * ...
+
+### Browser Extension
+
+* See: [TypeScript libraries](#typescript-libraries)
 
 ## Project Plan
 
