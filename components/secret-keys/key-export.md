@@ -179,11 +179,11 @@ As far as cryptographic token designs go, PASETO was designed to be misuse-resis
 * PASETO is simple for users. You don't have to reason about block cipher modes and their security implications. Your
   choices are simply:
   1. Do I need to use NIST-approved algorithms (i.e. my OS is in FIPS mode)?
-    * YES: `v3`
-    * NO: `v4` (default)
+     * YES: `v3`
+     * NO: `v4` (default)
   2. Do I need a separation of capabilities between token creators and token verifiers?
-    * YES: `public`
-    * NO: `local`
+     * YES: `public`
+     * NO: `local`
 * PASETO publishes a [clear rationale for its design decisions with new protocol versions](https://github.com/paseto-standard/paseto-spec/blob/master/docs/Rationale-V3-V4.md).
   JWT is an "Everything But the Kitchen Sink" standard whose rationale is unclear.
 
