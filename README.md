@@ -84,6 +84,16 @@ attacks (see: [Invisible Salamanders](https://eprint.iacr.org/2019/016)).
 
 The client-side key management is solely concerned with managing users' secret keys across devices.
 
+E2EE-capable clients will output an Ed25519 public key, which will be used with the Federated Public Key Infrastructure
+(FPKI).
+
+When a user wants to send an encrypted message to another user, they will first fetch their public key from the fPKI.
+This public key will allow them to verify the protocol messages sent by the asynchronous forward-secure ratcheting
+protocol.
+
+Finally, each conversation will involve messages and media encrypted using the keys derived from the ratcheting 
+protocol. This is the only part that interacts with user-generated content (rather than device-generated entropy).
+
 ## Structure of the Deliverables
 
 ### Mastodon-Android
