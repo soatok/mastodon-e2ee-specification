@@ -1,5 +1,7 @@
 # Exporting Keys to Multiple Devices
 
+> Parent Document: [Client-Side Key Management](../client-side-key-management.md)
+
 ## Overview
 
 This document describes the protocols used to export keys generated on one device onto another device.
@@ -45,7 +47,9 @@ This is the preferred workflow, since the server isn't involved.
 2. **Sender**: Call [`GenerateQRCodeForExport(main_key, password, device_name = """)`](#createqrcodeforexport)
 3. **Sender**: Display QR code
 4. **Receiver**: Scan QR code (from step 3)
-5. **Receiver**: Call [`UnwrapMainKeyFromQRCode(paseto, password, device_name = "")](#unwrapmainkeyfromqrcode)
+5. **Receiver**: Call [`UnwrapMainKeyFromQRCode(paseto, password, device_name = "")`](#unwrapmainkeyfromqrcode)
+
+### Workflow 4
 
 ## Operations
 
