@@ -12,18 +12,21 @@ At a high level overview, there are three underlying technologies used to perfor
 2. An encrypted token format ([PASETO](https://github.com/paseto-standard/paseto-spec))
 3. An asymmetric key-wrapping format ([PASERK](https://github.com/paseto-standard/paserk))
 
-Three distinct workflows will be possible with these components:
+Four distinct workflows will be possible with these components:
 
 1. Copying a cryptographic secret from a mobile device to a browser extension
 2. Copying a cryptographic secret from a browser extension to a mobile device
 3. Copying a cryptographic secret from one mobile device to another
+4. Copying a cryptographic secret to/from a flat file (i.e. for offline key backup)
 
-Of these three workflows, the first is the riskiest, because the data must transfer from the device to the browser
+Of these four workflows, the first is the riskiest, because the data must transfer from the device to the browser
 extension; which, for usability, calls for passing an encrypted secret to the server and decrypting it in the browser.
 This is because calling the web browser on a particular computer from the mobile device may be difficult in many
 networking environments.
 
 Workflows 2 and 3 can be facilitated with only a QR code; no server needed.
+
+Workflow 4 doesn't even need a QR code, nor a server.
 
 ## Workflows
 
@@ -44,12 +47,18 @@ This is exclusively used for devices that do not possess a camera (i.e. browser 
 This is the preferred workflow, since the server isn't involved.
 
 1. **Sender**: Prompt user for a password or PIN for the transfer 
-2. **Sender**: Call [`GenerateQRCodeForExport(main_key, password, device_name = """)`](#createqrcodeforexport)
+2. **Sender**: Call [`CreateQRCodeForExport(main_key, password, device_name = """)`](#createqrcodeforexport)
 3. **Sender**: Display QR code
 4. **Receiver**: Scan QR code (from step 3)
-5. **Receiver**: Call [`UnwrapMainKeyFromQRCode(paseto, password, device_name = "")`](#unwrapmainkeyfromqrcode)
+5. **Receiver**: Call [`ImportMainKey(paseto, password, device_name = "")`](#importmainkey)
 
 ### Workflow 4
+
+1. **Sender**: Prompt user for a password or PIN for the transfer
+2. **Sender**: Call [`ExportMainKey(main_key, password, device_name = """)`](#exportmainkey)
+3. **Sender**: Save the output of step 2 to the filesystem
+4. **Receiver**: Load from filesystem (from step 3)
+5. **Receiver**: Call [`ImportMainKey(paseto, password, device_name = "")`](#importmainkey)
 
 ## Operations
 
@@ -124,6 +133,38 @@ This is used for [Workflow 1](#workflow-1). This runs on the device that receive
 
 **Output**: A 256-bit `main_key`.
 
+### ExportMainKey
+
+This is used for [Workflow 4](#workflow-4) directly, as well as [Workflows 2 and 3](#workflows-2-and-3)
+(via [CreateQRCodeForExport](#createqrcodeforexport)). This runs on the device that sends the key.
+
+**Inputs**:
+1. `main_key` - The key being exported for a given account
+   * This **MUST** be base64url-encoded (as per RFC 4648). It **SHOULD NOT** be padded with `=` characters.
+2. `password` - Used to encrypt the secret key across devices
+3. `device_name` - The nickname of the device (optional, defaults to empty string)
+
+**Algorithm**:
+
+1. Generate a one-time 256-bit transfer key `transfer_key`.
+2. Use PASERK's [`local-pw`](https://github.com/paseto-standard/paserk/blob/master/types/local.md) type to encrypt
+   `transfer_key` with the `password` (Input 2) to yield `wrapped_transfer_key`.
+3. Generate a Local PASETO token using `transfer_key` with the following parameters:
+   * `payload`:
+      * `main_key`: Input 1
+   * `footer`:
+      * `wpk`: `wrapped_transfer_key`
+   * `implicit_assertion`:
+      * `device`: Input 3
+4. Return the PASETO token.
+
+The permitted algorithms for this operation (as of the time of this writing) are:
+
+* PASETO `v3.local`
+* PASETO `v4.local` (default token format)
+* PASERK `k3.local-pw`
+* PASERK `k4.local-pw` (default password-based key-wrapping format)
+
 ### CreateQRCodeForExport
 
 This is used for [Workflows 2 and 3](#workflows-2-and-3). This runs on the device that sends the key.
@@ -136,28 +177,13 @@ This is used for [Workflows 2 and 3](#workflows-2-and-3). This runs on the devic
 
 **Algorithm**:
 
-1. Generate a one-time 256-bit transfer key `transfer_key`.
-2. Use PASERK's [`local-pw`](https://github.com/paseto-standard/paserk/blob/master/types/local.md) type to encrypt
-   `transfer_key` with the `password` (Input 2) to yield `wrapped_transfer_key`.
-3. Generate a Local PASETO token using `transfer_key` with the following parameters:
-    * `payload`:
-        * `main_key`: Input 1
-    * `footer`:
-        * `wpk`: `wrapped_transfer_key`
-    * `implicit_assertion`:
-        * `device`: Input 3
-4. Encode the PASETO token (output of step 3) as a QR code image to be scanned with a mobile device.
+1. Call [`ExportMainKey(main_key, password, device_name = "")`](#exportmainkey)
+2. Encode the PASETO token (output of step 1) as a QR code image to be scanned with a mobile device.
 
-The permitted algorithms for this operation (as of the time of this writing) are:
+### ImportMainKey
 
-* PASETO `v3.local`
-* PASETO `v4.local` (default token format)
-* PASERK `k3.local-pw`
-* PASERK `k4.local-pw` (default password-based key-wrapping format)
-
-### UnwrapMainKeyFromQRCode
-
-This is used for [Workflows 2 and 3](#workflows-2-and-3). This will run on the device that receives the key.
+This is used for both [Workflows 2 and 3](#workflows-2-and-3), as well as [Workflow 4](#workflow-4).
+This will run on the device that receives the key.
 
 **Inputs**:
 
