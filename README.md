@@ -55,6 +55,8 @@ attacks (see: [Invisible Salamanders](https://eprint.iacr.org/2019/016)).
    to remain confidential.
 3. **Deniability and/or Anonymity.** We cannot hide the social graph from ActivityPub, nor escape the use of
    [HTTP Signatures](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures-13).
+4. **Government Compliance.** We aren't selling anything to a government, nor to corporations that sell to governments.
+   There's no sense in catering to their lists of approved cryptographic algorithms.
 
 ### Security Goals
 
