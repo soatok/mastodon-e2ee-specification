@@ -9,7 +9,7 @@ their passphrases (also known as "passwords" colloquially). A password manager (
 highly recommended for most users that elect this key recovery mechanism.
 
 For simplicity, we are going to implement Draft 09 or later of the 
-[OPAQUE RFC](7https://datatracker.ietf.org/doc/draft-irtf-cfrg-opaque/09/). OPAQUE will be used to store and recover
+[OPAQUE RFC](https://datatracker.ietf.org/doc/draft-irtf-cfrg-opaque/09/). OPAQUE will be used to store and recover
 the **export_key**, which will then be used to encrypt the **Main Key**.
 
 ## Operations
