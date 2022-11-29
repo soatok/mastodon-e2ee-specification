@@ -153,7 +153,7 @@ def EncryptMainKey(export_key, main_key):
 
 **Outputs**:
 
-* `export_key` - OPAQUE export key
+* `main_key` - plaintext Main Key
 
 **Algorithm**:
 
