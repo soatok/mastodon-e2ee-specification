@@ -106,21 +106,21 @@ def RecoverMainKey(encrypted_main_key, passphrase, server_public_key, envelope, 
    * IKM = export_key
    * info = `SoatokE2EEProposalV1-PBKW-Encrypt` followed by `N1`
    * salt = NULL
-   * length = 48
+   * length = 44
    * The first 32 bytes of output will be the encryption key, `Ek`
-   * The remaining 32 bytes of output will be the derived nonce, `N2`
+   * The remaining 12 bytes of output will be the derived nonce, `N2`
 3. Derive an authentication key with HKDF-SHA512
    * IKM = export_key
    * info = `SoatokE2EEProposalV1-PBKW-Auth` followed by `N1`
    * salt = NULL
-   * length = 48
+   * length = 32
    * The total output will be the authentication key, `Ak`
-4. Encrypt the payload using AES-256 in Counter Mode (AES-256-CTR)
+4. Encrypt the payload using ChaCha20
    * Message = `main_key`
    * Nonce = `N2`
    * Key = `Ek`
    * The output will be called `C` (Ciphertext)
-5. Authenticate `N1` and `C` using HMAC-SHA-384
+5. Authenticate `N1` and `C` using BLAKE2b-MAC
    * Message = `N1` || `C`
    * Key = `Ak`
    * The output will be called `T` (Tag)
@@ -134,13 +134,13 @@ INFO_PREFIX_AUTH = b"SoatokE2EEProposalV1-PBKW-Auth"
 
 def EncryptMainKey(export_key, main_key):
     n1 = os.urandom(32)
-    tmp = hkdf_sha512(export_key, None, concat(INFO_PREFIX_ENCRYPT, n1), 48)
+    tmp = hkdf_sha512(export_key, None, concat(INFO_PREFIX_ENCRYPT, n1), 44)
     Ek = tmp[0:31]
     n2 = tmp[32:]
-    Ak = hkdf_sha512(export_key, None, concat(INFO_PREFIX_AUTH, n1), 48)
+    Ak = hkdf_sha512(export_key, None, concat(INFO_PREFIX_AUTH, n1), 32)
     
-    c = aes256ctr(key = Ek, nonce = n2, message = main_key)
-    t = hmac_sha384(key = Ak, concat(n1, c))
+    c = crypto_stream_chacha20_xor(key = Ek, nonce = n2, message = main_key)
+    t = crypto_generichash(key = Ak, msg = concat(n1, c), length = 32)
     return concat(n1, c, t)
 ```
 
@@ -165,9 +165,9 @@ def EncryptMainKey(export_key, main_key):
    * IKM = export_key
    * info = `SoatokE2EEProposalV1-PBKW-Auth` followed by `N1`
    * salt = NULL
-   * length = 48
+   * length = 32
    * The total output will be the authentication key, `Ak`
-3. Recalculate the authentication tag (`T2`) over `N1` and `C`
+3. Recalculate the authentication tag (`T2`) over `N1` and `C` using BLAKE2b-MAC
    * Message = `N1` || `C`
    * Key = `Ak`
    * The output will be called `T` (Tag)
@@ -176,10 +176,10 @@ def EncryptMainKey(export_key, main_key):
    * IKM = export_key
    * info = `SoatokE2EEProposalV1-PBKW-Encrypt` followed by `N1`
    * salt = NULL
-   * length = 48
+   * length = 44
    * The first 32 bytes of output will be the encryption key, `Ek`
-   * The remaining 32 bytes of output will be the derived nonce, `N2`
-6. Decrypt the payload using AES-256 in Counter Mode (AES-256-CTR)
+   * The remaining 12 bytes of output will be the derived nonce, `N2`
+6. Decrypt the payload using ChaCha20
    * Message = `C`
    * Nonce = `N2`
    * Key = `Ek`
@@ -194,10 +194,10 @@ INFO_PREFIX_AUTH = b"SoatokE2EEProposalV1-PBKW-Auth"
 def DecryptMainKey(export_key, encrypted_main_key):
     n1 = encrypted_main_key[0:31] # First 32 bytes
     c = encrypted_main_key[32:63] # Next 32 bytes
-    t = encrypted_main_key[64:] # Final 48 bytes
+    t = encrypted_main_key[64:] # Final 32 bytes
     
     Ak = hkdf_sha512(export_key, None, concat(INFO_PREFIX_AUTH, n1), 48)
-    t2 = hmac_sha384(key = Ak, concat(n1, c))
+    t2 = crypto_generichash(key = Ak, msg = concat(n1, c), length = 32)
     if not hmac.compare_digest(t2, t):
         raise Exception("Incorrect payload")
     
@@ -205,7 +205,7 @@ def DecryptMainKey(export_key, encrypted_main_key):
     Ek = tmp[0:31]
     n2 = tmp[32:]
     
-    return aes256ctr(key = Ek, nonce = n2, message = c)
+    return crypto_stream_chacha20_xor(key = Ek, nonce = n2, message = c)
 ```
 
 ## Design Decisions
@@ -236,15 +236,3 @@ the correct passphrase to successfully recover the wrapping_key that protects th
 
 However, the latest OPAQUE RFC draft exposes a consistent export_key (distinct from the randomized session_key).
 This export_key is ideal for our use case, and saves us from having to use two invocations of Argon2id.
-
-## To Be Decided
-
-### Key Wrapping
-
-We currently propose a simple construction (AES-256-CTR + HMAC-SHA384, encrypt-then-MAC) to actually encrypt the keys
-with the OPAQUE export_key.
-
-**TODO**:
-
-* Would ChaCha20 + BLAKE2b-MAC be better? (AES has cache-timing attacks.)
-  * Are we going to double down on libsodium for our underlying library?
