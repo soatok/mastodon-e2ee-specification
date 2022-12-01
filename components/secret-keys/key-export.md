@@ -92,8 +92,6 @@ This is used for [Workflow 1](#workflow-1). This will run on the device that sen
 2. Use PASERK's [`seal`](https://github.com/paseto-standard/paserk/blob/master/types/seal.md) type to encrypt
    `transfer_key` with `ed25519_pk` (Input 2) to yield `sealed_transfer_key`.
    * With the following parameters:
-     * PASETO v3 (PBKDF2-SHA384):
-       * `iterations`: `250_000`
      * PASETO v4 (Argon2id):
        * `memlimit`: `1_073_741_824` (`crypto_pwhash_MEMLIMIT_SENSITIVE`)
        * `opslimit`: `4` (`crypto_pwhash_OPSLIMIT_SENSITIVE`)
@@ -108,9 +106,7 @@ This is used for [Workflow 1](#workflow-1). This will run on the device that sen
 
 The permitted algorithms for this operation (as of the time of this writing) are:
 
-* PASETO `v3.local`
 * PASETO `v4.local` (default token format)
-* PASERK `k3.seal`
 * PASERK `k4.seal` (default public-key encryption for key-wrapping format)
 
 ### UnsealMainKey
@@ -160,9 +156,7 @@ This is used for [Workflow 4](#workflow-4) directly, as well as [Workflows 2 and
 
 The permitted algorithms for this operation (as of the time of this writing) are:
 
-* PASETO `v3.local`
 * PASETO `v4.local` (default token format)
-* PASERK `k3.local-pw`
 * PASERK `k4.local-pw` (default password-based key-wrapping format)
 
 ### CreateQRCodeForExport
@@ -216,7 +210,7 @@ As far as cryptographic token designs go, PASETO was designed to be misuse-resis
   choices are simply:
   1. Do I need to use NIST-approved algorithms (i.e. my OS is in FIPS mode)?
      * YES: `v3`
-     * NO: `v4` (default)
+     * NO: `v4` (**This is true for our design.**)
   2. Do I need a separation of capabilities between token creators and token verifiers?
      * YES: `public`
      * NO: `local`
@@ -250,3 +244,14 @@ If someone shoulder-surfs your QR code, this shouldn't immediately give them acc
 
 This is a defense-in-depth risk mitigation. Do not rely entirely on the security of this password. If you
 suspect someone copied your QR code for the device transfer, main key rotation is highly recommended.
+
+### Why Did You Remove the NIST/FIPS Algorithms From Your Proposal?
+
+1. I'm not selling anything. [FIPS 140](https://twitter.com/SoatokDhole/status/1582589266248753153) is just the minimum
+   bar to be able to sell to the US government. The algorithms it requires also happens to meet a lot of other
+   countries' cryptography requirements too, which is convenient if that's your goal.
+2. AES, which NIST requires, is difficult to implement securely in software. ChaCha is much easier for constant-time
+   implementations.
+3. This proposal is for the fediverse, which is emphatically against centralization. Appealing to governments is not
+   a goal. Appealing to corporations that have a vested interest in selling to governments is not a goal.
+4. The less attack surface we expose, the easier it is to verify the security of an implementation.
