@@ -4,6 +4,16 @@
 > Soatok will remove this notice when the specification is ready to review.
 > Until then, enjoy seeing my rough drafts evolve into something sane.
 
+## This is NOT ready for your input or feedback yet.
+
+Please watch the repository for updates. It should be ready for feedback in 2023.
+
+Do not ask about sections that have not yet been written, or advocate for specific protocols to be adopted. For all you
+know, that's exactly what I was planning to do anyway.
+
+You should assume everything will be rewritten multiple times before I'm happy with it. **Mastodon developers should
+especially avoid poisoning their perceptions by early drafts.**
+
 ## Background
 
 As a federated system, users may expect that their direct messages between users would be encrypted such that only they
