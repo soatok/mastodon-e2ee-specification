@@ -20,10 +20,10 @@ As a federated system, users may expect that their direct messages between users
 and the people they tag can read the conversation. However, no such end-to-end encryption is currently implemented in 
 Mastodon's direct messages.
 
-There have been [prior attempts to deliver E2EE in Mastodon](https://github.com/mastodon/mastodon/pull/13820), but they
-were not spearheaded by cryptography experts. The linked pull request proposed an HMAC-SHA256 _over the plaintext_ to 
-achieve message franking. This was also implemented entirely in Ruby, which means that the Mastodon server administrator
-could read everything... thereby failing to achieve the _end-to-end_ part of end-to-end encryption.
+There have been [prior attempts to deliver E2EE in Mastodon](https://github.com/mastodon/mastodon/pull/13820), but this
+work is incomplete (i.e. only implemented in the server-side Ruby code), and was not spearheaded by cryptography experts.
+To wit: The linked pull request proposed an HMAC-SHA256 _over the plaintext_ to achieve message franking, when there are 
+better ways to achieve these security goals without risking confidentiality.
 
 As cryptographers and security engineers, we aim to deliver end-to-end encryption to the Fediverse through ActivityPub,
 so that we might communicate privately when using Mastodon. Thus, while the goal is E2EE DMs in Mastodon, the scope will
@@ -31,17 +31,31 @@ be appropriately broad in some areas.
 
 ## Executive Summary
 
+To achieve our end goal of end-to-end encryption (E2EE) for Direct Messages in Mastodon (and other ActivityPub
+software), we will divide this work into four distinct problem domains and then define how they are unified together.
+
 We propose an architecture that's predicated on key material never being revealed to the server. To this end, we begin
-with a proposal for Client-Side Key Management for Mastodon Web, Mastodon Android, and Mastodon iOS.
+with a proposal for Client-Side Key Management. This will be realized through multiple clients (iOS, Android, Desktop)
+as well as a Browser Extension, but not through in-browser JavaScript delivered from a website.
 
 With a reasonable proposal for securing users' secret key material in play, propose a Federated Public Key 
-Infrastructure.
+Infrastructure. This allows users to fetch each other's public keys with some assurance that it's the correct public key
+for their recipient.
 
 Next, we specify an Asynchronous Forward-Secure Ratcheting Protocol for negotiating the symmetric keys needed to encrypt
-messages between Mastodon users.
+messages between users. We focus on group messaging as a first-class feature, with authenticated group actions that do
+not depend on a trusted server.
 
 Finally, we propose a Symmetric-Key Message Encryption Format that is fast, secure, and resilient against multi-key
-attacks (see: [Invisible Salamanders](https://eprint.iacr.org/2019/016)).
+attacks (see: [Invisible Salamanders](https://eprint.iacr.org/2019/016)). We define both message encryption and media
+encryption in this level.
+
+The primary output of the Secret Key Management component is a Public Key, which is passed to the Federated Public Key
+Infrastructure. Group Messaging uses these Public Keys for group membership verification as it operates a forward-secure
+ratchet. This ratcheting protocol produces symmetric keys for encrypting messages and media attachments.
+
+With these pieces in place, we can deliver secure end-to-end encryption to the fediverse. Security experts can focus on
+the components independently, or in conjunction with each other.
 
 ## Design Tenets
 
@@ -65,6 +79,7 @@ attacks (see: [Invisible Salamanders](https://eprint.iacr.org/2019/016)).
    to remain confidential.
 3. **Deniability and/or Anonymity.** We cannot hide the social graph from ActivityPub, nor escape the use of
    [HTTP Signatures](https://datatracker.ietf.org/doc/html/draft-ietf-httpbis-message-signatures-13).
+   Given the environment we're operating under, we cannot reasonably tackle these security properties at this time.
 4. **Government Compliance.** We aren't selling anything to a government, nor to corporations that sell to governments.
    There's no sense in catering to their lists of approved cryptographic algorithms.
 
