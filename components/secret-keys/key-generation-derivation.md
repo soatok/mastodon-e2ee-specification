@@ -12,6 +12,33 @@ Any other keys needed for the operation of E2EE will be then be one of the follo
 * Derived from the Main Key (long-lived)
 * Generated randomly (ephemeral)
 
+## Key Trees
+
+The following diagram depicts the relations between key components.
+Arrows point from a component to any other component(s) that can be derived from it.
+
+```mermaid
+flowchart BT
+  MainKey[Main Key]
+  IdentitySK["Identity Secret Key"]
+  IdentityPK["Identity Public Key"]
+  WrappingKey["Wrapping Key"]
+  EphemeralSK["Ephemeral Secret Key"]
+  EphemeralPK["Ephemeral Public Key"]
+
+  subgraph longlived[Long-lived Keys]
+    direction BT
+    MainKey -- KDF.Ed25519 --> IdentitySK
+    IdentitySK -- Ed25519.ToPublic --> IdentityPK
+    MainKey -- KDF.WrapX25519 --> WrappingKey
+  end
+
+  subgraph ephemeral[Ephemeral Keys]
+    direction BT
+    EphemeralSK -- X25519 --> EphemeralPK
+  end
+```
+
 ## Key Generation
 
 The algorithm for generating keys (including the Main Key) will simply be reading the appropriate number of bytes from
