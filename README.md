@@ -172,12 +172,12 @@ protocol. This is the only part that interacts with user-generated content (rath
 
 ## Project Plan
 
-This is the plan (as of 2022-11-13) for this project. 
+This is the plan (as of 2022-12-21) for this project. 
 
 1. Write a design document containing the scope of work, threat models, and a formal specification
    of every component and the overall architecture. **(WIP)**
-2. Review these designs with peers from the cryptography community. (2022-12-xx?)
-3. Share this design document with the Mastodon community for their consideration. (2022-12-xx?)
+2. Review these designs with peers from the cryptography community. (2023-01-xx?)
+3. Share this design document with the Mastodon community for their consideration. (2023-01-xx?)
 4. Investigate formal methods and symbolic model checking before we even implementation. (2023-01-xx?)
 5. Implement in JavaScript for inclusion in Mastodon for Web. (2023-02-xx?)
 6. Create a Pull Request for Mastodon on GitHub to implement the necessary parts. (2023-04-xx?) 
