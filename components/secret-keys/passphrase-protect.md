@@ -236,10 +236,3 @@ the correct passphrase to successfully recover the wrapping_key that protects th
 
 However, the latest OPAQUE RFC draft exposes a consistent export_key (distinct from the randomized session_key).
 This export_key is ideal for our use case, and saves us from having to use two invocations of Argon2id.
-
-### Why Argon2 and not PBKDF2?
-
-While it's true that [PBKDF2 is easier in JavaScript than Argon2](https://soatok.blog/2022/12/29/what-we-do-in-the-etc-shadow-cryptography-with-passwords/),
-we aren't building a product to be sold nor a service to subscribe to.
-
-If users cannot access their backed up private keys in lockdown mode, they're free to choose other backup methods.

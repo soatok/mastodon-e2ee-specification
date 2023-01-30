@@ -255,3 +255,10 @@ suspect someone copied your QR code for the device transfer, main key rotation i
 3. This proposal is for the fediverse, which is emphatically against centralization. Appealing to governments is not
    a goal. Appealing to corporations that have a vested interest in selling to governments is not a goal.
 4. The less attack surface we expose, the easier it is to verify the security of an implementation.
+
+### Why Argon2 and not PBKDF2?
+
+PASERK `k4.local-pw` uses Argon2id rather than PBKDF2.
+
+While it's true that [PBKDF2 is easier in JavaScript than Argon2](https://soatok.blog/2022/12/29/what-we-do-in-the-etc-shadow-cryptography-with-passwords/),
+we aren't building a product to be sold nor a service to subscribe to.
