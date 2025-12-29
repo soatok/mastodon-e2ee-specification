@@ -1,5 +1,38 @@
 # End-to-End Encryption for Mastodon
 
+> [!NOTE]
+> **I'm archiving this project in favor of [swicg/activitypub-e2ee](https://github.com/swicg/activitypub-e2ee).**
+>
+> When I set out to write an E2EE specification in 2022, there had been no significant movement towards E2EE for the
+> Fediverse. Just a lot of dead ends by people without serious cryptography engineering chops.
+>
+> I decided to tackle this problem in this order:
+> 
+> 1. Client-side secret key management
+>    * This was actually covered in this spec repository. Yay!
+> 2. Federated PKI
+>    * How do you know which public key is the right one for your users?
+>    * This turned out to be a much more challenging problem than anyone appreciated. So I spent most of my time
+>      trying to solve this, which resulted in a [specification](https://github.com/fedi-e2ee/public-key-directory-specification)
+>      and [reference implementation](https://github.com/fedi-e2ee/pkd-server-php).
+>    * More info on the [announcement blog post](https://soatok.blog/2025/12/15/announcing-key-transparency-fediverse/).
+> 3. Group Key Agreement + Forward Secure Ratcheting
+>    * Basically, once you have the first two components, how can you setup private groups?
+>    * It turns out, [IETF RFC 9420](https://www.rfc-editor.org/rfc/rfc9420.html) is an excellent building block for this,
+>      provided you [understand that the Authentication Service is deliberately not specified](https://soatok.blog/2025/08/25/barking-up-the-ratchet-tree-mls-is-neither-royal-nor-nude/).
+> 4. The actual message encryption step.
+>    * This is usually the part homebrew "e2ee" projects start with. It's the least difficult piece of the four (in the sense that
+>      the essential complexity is very low and there are many examples of doing this right to learn from).
+>
+> The [swicg/activitypub-e2ee](https://github.com/swicg/activitypub-e2ee) project is building on MLS and is currently
+> receptive to my feedback, so I'm going to focus my efforts there.
+>
+> If things change, I will un-archive this repo and start over with my own design.
+
+## Original Readme File Continues Below
+
+-----
+
 > **Note:** This document is _very much_ a work in progress.
 > Soatok will remove this notice when the specification is ready to review.
 > Until then, enjoy seeing my rough drafts evolve into something sane.
